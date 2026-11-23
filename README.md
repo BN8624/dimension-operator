@@ -2,6 +2,10 @@
 
 현대 SF 판타지 웹소설 집필 저장소입니다. 제목, 인물명, 기업명은 모두 가칭입니다.
 
+**리더로 읽기:** https://bn8624.github.io/dimension-operator/ (GitHub Pages를 켠 뒤부터 열립니다)
+
+저장소 루트의 `index.html`이 리더입니다. `episodes/`, `docs/`, `changelog/`, `archive/`의 md 파일을 자동으로 찾아 회차별 최신 판을 보여 줍니다. 새 판을 올리면 별도 작업 없이 반영됩니다.
+
 ## 폴더 구성
 
 | 폴더 | 내용 |

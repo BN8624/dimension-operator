@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>차원관리사업부 리더</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<style>
+:root{
+  --bg:#f6f3ee; --surface:#fffdf9; --text:#26231f; --muted:#7a736a; --line:#e4ddd2;
+  --accent:#2f6f6a; --accent-soft:#e3efed; --sys-bg:#eef2f6; --sys-text:#2a4a6b; --sys-line:#c9d6e4;
+  --msg-bg:#fbefe6; --msg-text:#7a4a2a;
+  --font-size:18px; --line-height:1.9;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#17181a; --surface:#1f2023; --text:#e7e3dc; --muted:#9a948b; --line:#33343a;
+    --accent:#7cc4bc; --accent-soft:#22332f; --sys-bg:#1c2430; --sys-text:#a9c6e6; --sys-line:#2e3d52;
+    --msg-bg:#2e241d; --msg-text:#e6b994;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17181a; --surface:#1f2023; --text:#e7e3dc; --muted:#9a948b; --line:#33343a;
+  --accent:#7cc4bc; --accent-soft:#22332f; --sys-bg:#1c2430; --sys-text:#a9c6e6; --sys-line:#2e3d52;
+  --msg-bg:#2e241d; --msg-text:#e6b994;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font-family:"Noto Sans KR",system-ui,sans-serif;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit}
+a{color:var(--accent)}
+header{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar{max-width:760px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:8px}
+.brand{font-weight:700;font-size:15px;text-decoration:none;color:var(--text);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand small{color:var(--muted);font-weight:400;margin-left:6px}
+.iconbtn{border:1px solid var(--line);background:var(--surface);border-radius:8px;height:34px;min-width:34px;padding:0 9px;cursor:pointer;font-size:14px}
+.iconbtn:hover{border-color:var(--accent)}
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:6;transition:width .1s}
+main{max-width:760px;margin:0 auto;padding:20px 16px 80px}
+/* library */
+.hero{padding:18px 0 8px}
+.hero h1{font-family:"Noto Serif KR",serif;font-size:26px;margin:0 0 4px}
+.hero p{margin:0;color:var(--muted);font-size:14px}
+.continue{display:block;margin:18px 0 6px;padding:14px 16px;border-radius:12px;background:var(--accent-soft);color:var(--text);text-decoration:none;border:1px solid transparent}
+.continue:hover{border-color:var(--accent)}
+.continue b{color:var(--accent)}
+.section{margin-top:28px}
+.section h2{font-size:13px;letter-spacing:.04em;color:var(--muted);font-weight:500;margin:0 0 10px;display:flex;justify-content:space-between;align-items:center}
+.list{display:grid;gap:8px}
+.item{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--text)}
+.item:hover{border-color:var(--accent)}
+.num{font-family:"Noto Serif KR",serif;font-size:20px;color:var(--accent);min-width:40px;text-align:center}
+.meta{flex:1;min-width:0}
+.meta .t{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta .s{font-size:12.5px;color:var(--muted);margin-top:2px}
+.badge{font-size:11.5px;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.badge.read{background:transparent;color:var(--muted);border:1px solid var(--line)}
+details.archive summary{cursor:pointer;color:var(--muted);font-size:13px;margin:4px 0 10px}
+.empty,.err{color:var(--muted);font-size:14px;padding:12px 0}
+/* reader */
+.crumbs{font-size:13px;color:var(--muted);margin-bottom:6px}
+.crumbs a{text-decoration:none}
+article{font-family:"Noto Serif KR",serif;font-size:var(--font-size);line-height:var(--line-height);word-break:keep-all;overflow-wrap:anywhere}
+article.doc{font-family:"Noto Sans KR",sans-serif;font-size:calc(var(--font-size) - 2px);line-height:1.75}
+article h1{font-size:1.45em;line-height:1.4;margin:.6em 0 1.4em;text-align:center}
+article.doc h1{text-align:left;margin-bottom:.8em}
+article h2{font-size:1.15em;margin:1.8em 0 .6em}
+article h3{font-size:1.02em;margin:1.4em 0 .5em}
+article p{margin:0 0 1.05em}
+article hr{border:0;text-align:center;margin:2.2em 0}
+article hr::after{content:"◆";color:var(--muted);font-size:.7em}
+article p.sys{font-family:"Noto Sans KR",sans-serif;font-size:.86em;background:var(--sys-bg);color:var(--sys-text);border-left:3px solid var(--sys-line);padding:.45em .9em;border-radius:4px;margin:.35em 0}
+article p.sys + p:not(.sys){margin-top:1.1em}
+article p.sys strong{font-weight:500}
+article p.msg + p:not(.msg){margin-top:1.1em}
+article p.msg{font-family:"Noto Sans KR",sans-serif;font-size:.92em;line-height:1.6;background:var(--msg-bg);color:var(--msg-text);padding:.5em .9em;border-radius:14px 14px 14px 4px;display:table;max-width:90%;margin:.35em 0}
+article p.end{text-align:center;color:var(--muted);margin-top:2em}
+article table{border-collapse:collapse;width:100%;font-size:.88em;margin:1em 0;display:block;overflow-x:auto}
+article th,article td{border:1px solid var(--line);padding:6px 9px;vertical-align:top;text-align:left}
+article th{background:var(--surface)}
+article code{font-size:.88em;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:0 4px}
+article blockquote{margin:1em 0;padding:.4em 1em;border-left:3px solid var(--line);color:var(--muted)}
+.pager{display:flex;gap:10px;margin-top:40px}
+.pager a{flex:1;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);text-decoration:none;color:var(--text);font-size:14px}
+.pager a:hover{border-color:var(--accent)}
+.pager .next{text-align:right}
+.pager small{display:block;color:var(--muted);font-size:12px}
+.panel{position:fixed;right:16px;top:58px;z-index:7;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;box-shadow:0 8px 24px rgba(0,0,0,.12);display:none;width:220px}
+.panel.open{display:block}
+.panel .row{display:flex;justify-content:space-between;align-items:center;margin:6px 0;font-size:13px}
+.panel .row div{display:flex;gap:6px}
+@media (max-width:480px){ .hero h1{font-size:22px} :root{--font-size:17px} .brand small{display:none} }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header><div class="bar">
+  <a class="brand" href="#/">《차원관리사업부》<small>리더</small></a>
+  <button class="iconbtn" id="settingsBtn" aria-label="보기 설정">가</button>
+  <button class="iconbtn" id="themeBtn" aria-label="테마 전환">◐</button>
+</div></header>
+<div class="panel" id="panel">
+  <div class="row"><span>글자 크기</span><div><button class="iconbtn" data-fs="-1">−</button><button class="iconbtn" data-fs="1">+</button></div></div>
+  <div class="row"><span>줄 간격</span><div><button class="iconbtn" data-lh="-0.1">−</button><button class="iconbtn" data-lh="0.1">+</button></div></div>
+</div>
+<main id="app"><p class="empty">불러오는 중…</p></main>
+
+<script>
+const OWNER = "BN8624", REPO = "dimension-operator", BRANCH = "main";
+const FOLDERS = ["episodes", "docs", "changelog", "archive"];
+const $app = document.getElementById("app");
+
+/* ---------- storage (safe) ---------- */
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+
+/* ---------- prefs ---------- */
+function applyPrefs(){
+  const p = store.get("prefs", {fs:18, lh:1.9, theme:null});
+  const r = document.documentElement;
+  r.style.setProperty("--font-size", p.fs + "px");
+  r.style.setProperty("--line-height", p.lh);
+  if (p.theme) r.dataset.theme = p.theme; else delete r.dataset.theme;
+}
+function updatePrefs(fn){ const p = store.get("prefs", {fs:18, lh:1.9, theme:null}); fn(p); store.set("prefs", p); applyPrefs(); }
+applyPrefs();
+document.getElementById("themeBtn").onclick = () => updatePrefs(p => {
+  const dark = p.theme ? p.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  p.theme = dark ? "light" : "dark";
+});
+const panel = document.getElementById("panel");
+document.getElementById("settingsBtn").onclick = e => { e.stopPropagation(); panel.classList.toggle("open"); };
+document.addEventListener("click", e => { if (!panel.contains(e.target)) panel.classList.remove("open"); });
+panel.querySelectorAll("[data-fs]").forEach(b => b.onclick = () => updatePrefs(p => { p.fs = Math.min(26, Math.max(14, p.fs + +b.dataset.fs)); }));
+panel.querySelectorAll("[data-lh]").forEach(b => b.onclick = () => updatePrefs(p => { p.lh = Math.round(Math.min(2.4, Math.max(1.5, p.lh + +b.dataset.lh)) * 10) / 10; }));
+
+/* ---------- file index ---------- */
+function parseName(folder, name){
+  const m = name.match(/^(.*?)_v(\d+)\.(\d+)\.md$/);
+  if (!m) return {folder, name, base:name.replace(/\.md$/, ""), ver:[0,0], path:`${folder}/${name}`};
+  return {folder, name, base:m[1], ver:[+m[2], +m[3]], path:`${folder}/${name}`};
+}
+const cmpVer = (a, b) => a.ver[0] - b.ver[0] || a.ver[1] - b.ver[1];
+
+async function listFolder(folder){
+  const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${folder}?ref=${BRANCH}`);
+  if (!res.ok) throw new Error(`목록을 불러오지 못했습니다 (${res.status})`);
+  const data = await res.json();
+  return data.filter(f => f.type === "file" && f.name.endsWith(".md")).map(f => parseName(folder, f.name));
+}
+let indexCache = null;
+async function getIndex(){
+  if (indexCache) return indexCache;
+  try{
+    const c = JSON.parse(sessionStorage.getItem("idx") || "null");
+    if (c && Date.now() - c.t < 5 * 60 * 1000) return (indexCache = c.d);
+  }catch(e){}
+  const all = {};
+  for (const f of FOLDERS){ try{ all[f] = await listFolder(f); }catch(e){ all[f] = []; all._err = e.message; } }
+  try{ sessionStorage.setItem("idx", JSON.stringify({t:Date.now(), d:all})); }catch(e){}
+  return (indexCache = all);
+}
+function latestByBase(files){
+  const map = {};
+  for (const f of files){ if (!map[f.base] || cmpVer(f, map[f.base]) > 0) map[f.base] = f; }
+  return Object.values(map);
+}
+function episodes(idx){
+  return latestByBase(idx.episodes || [])
+    .map(f => ({...f, no: +((f.base.match(/(\d+)/) || [0,0])[1])}))
+    .sort((a, b) => a.no - b.no);
+}
+
+/* ---------- markdown ---------- */
+const textCache = {};
+async function getText(path){
+  if (textCache[path]) return textCache[path];
+  const res = await fetch(path + "?t=" + Math.floor(Date.now() / 60000));
+  if (!res.ok) throw new Error(`파일을 열지 못했습니다 (${res.status})`);
+  return (textCache[path] = await res.text());
+}
+const titleOf = md => ((md.match(/^#\s+(.+)$/m) || [,""])[1]).trim();
+const charCount = md => md.replace(/[#*`\-]/g, "").replace(/\n/g, "").length;
+
+function render(md){
+  const html = DOMPurify.sanitize(marked.parse(md, {gfm:true, breaks:false}));
+  const box = document.createElement("div");
+  box.innerHTML = html;
+  box.querySelectorAll("p").forEach(p => {
+    const t = p.textContent.trim();
+    const only = p.children.length === 1 && p.firstElementChild.tagName === "STRONG" && p.textContent.trim() === p.firstElementChild.textContent.trim();
+    if (only && /^\[.*\]$/.test(t)) p.classList.add("sys");
+    else if (/^「[\s\S]*」$/.test(t)) p.classList.add("msg");
+    else if (p.children.length === 1 && p.firstElementChild.tagName === "EM" && /끝$/.test(t)) p.classList.add("end");
+  });
+  return box.innerHTML;
+}
+
+/* ---------- reading progress ---------- */
+const readKey = "read";
+function markRead(path, ratio){
+  const r = store.get(readKey, {});
+  const prev = r[path] || {};
+  r[path] = {pos: ratio, done: prev.done || ratio > 0.95, at: Date.now()};
+  store.set(readKey, r);
+  store.set("last", path);
+}
+let scrollHandler = null;
+function trackScroll(path){
+  const bar = document.getElementById("progress");
+  if (scrollHandler) removeEventListener("scroll", scrollHandler);
+  let t = 0;
+  scrollHandler = () => {
+    const h = document.documentElement.scrollHeight - innerHeight;
+    const ratio = h > 0 ? Math.min(1, scrollY / h) : 1;
+    bar.style.width = (ratio * 100) + "%";
+    clearTimeout(t); t = setTimeout(() => markRead(path, ratio), 250);
+  };
+  addEventListener("scroll", scrollHandler, {passive:true});
+  scrollHandler();
+}
+function stopTrack(){ if (scrollHandler) removeEventListener("scroll", scrollHandler); scrollHandler = null; document.getElementById("progress").style.width = 0; }
+
+/* ---------- views ---------- */
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const href = path => "#/read/" + encodeURIComponent(path);
+
+async function viewLibrary(){
+  stopTrack();
+  document.title = "차원관리사업부 리더";
+  $app.innerHTML = `<p class="empty">불러오는 중…</p>`;
+  const idx = await getIndex();
+  const eps = episodes(idx);
+  const read = store.get(readKey, {});
+  const metas = await Promise.all(eps.map(async e => {
+    try{ const md = await getText(e.path); return {title: titleOf(md), chars: charCount(md)}; }
+    catch(err){ return {title: e.name, chars: 0}; }
+  }));
+  const last = store.get("last", null);
+  const lastEp = eps.find(e => e.path === last) || null;
+  const lastDoc = !lastEp && last ? last : null;
+
+  let h = `<div class="hero"><h1>《차원관리사업부》</h1><p>집필 중 원고 · 최신 판 기준</p></div>`;
+  if (lastEp){
+    const i = eps.indexOf(lastEp), m = metas[i], r = read[lastEp.path] || {};
+    h += `<a class="continue" href="${href(lastEp.path)}"><b>이어 읽기</b> · ${esc(m.title || lastEp.name)} <span style="color:var(--muted)">(${Math.round((r.pos||0)*100)}%)</span></a>`;
+  } else if (lastDoc){
+    h += `<a class="continue" href="${href(lastDoc)}"><b>마지막으로 본 문서</b> · ${esc(lastDoc.split("/").pop())}</a>`;
+  }
+  h += `<div class="section"><h2><span>회차</span><span>${eps.length}화</span></h2><div class="list">`;
+  if (!eps.length) h += `<p class="empty">회차 파일이 없습니다.</p>`;
+  eps.forEach((e, i) => {
+    const m = metas[i], r = read[e.path];
+    const title = (m.title || "").replace(/^제\d+화\.\s*/, "");
+    const badge = r ? (r.done ? `<span class="badge read">읽음</span>` : `<span class="badge">${Math.round(r.pos*100)}%</span>`) : `<span class="badge">새 글</span>`;
+    h += `<a class="item" href="${href(e.path)}"><span class="num">${e.no}</span><span class="meta"><div class="t">${esc(title)}</div><div class="s">v${e.ver.join(".")} · ${m.chars.toLocaleString()}자</div></span>${badge}</a>`;
+  });
+  h += `</div></div>`;
+
+  const docs = latestByBase(idx.docs || []).sort((a, b) => a.base.localeCompare(b.base));
+  h += docSection("설정 문서", docs);
+  const logs = latestByBase(idx.changelog || []).sort((a, b) => b.base.localeCompare(a.base));
+  h += docSection("수정 기록", logs);
+  const arch = (idx.archive || []).slice().sort((a, b) => a.base.localeCompare(b.base) || cmpVer(a, b));
+  if (arch.length){
+    h += `<div class="section"><details class="archive"><summary>이전 판 ${arch.length}개 보기</summary><div class="list">`;
+    arch.forEach(f => h += `<a class="item" href="${href(f.path)}"><span class="meta"><div class="t">${esc(f.base)}</div><div class="s">v${f.ver.join(".")}</div></span></a>`);
+    h += `</div></details></div>`;
+  }
+  if (idx._err) h += `<p class="err">일부 목록을 불러오지 못했습니다: ${esc(idx._err)}</p>`;
+  $app.innerHTML = h;
+  scrollTo(0, 0);
+}
+function docLabel(base){
+  const map = {PROJECT_PLAN:"기획안", STORY_STATE:"상태 기록", CHANGELOG:"수정 기록"};
+  for (const k in map){ if (base.startsWith(k)){ const rest = base.slice(k.length).replace(/^_/, "").replace(/_/g, "·"); return map[k] + (rest ? " " + rest : ""); } }
+  return base;
+}
+function docSection(label, files){
+  if (!files.length) return "";
+  let h = `<div class="section"><h2><span>${label}</span></h2><div class="list">`;
+  files.forEach(f => h += `<a class="item" href="${href(f.path)}"><span class="meta"><div class="t">${esc(docLabel(f.base))}</div><div class="s">${esc(f.name)}</div></span></a>`);
+  return h + `</div></div>`;
+}
+
+async function viewRead(path){
+  $app.innerHTML = `<p class="empty">불러오는 중…</p>`;
+  let md;
+  try{ md = await getText(path); }
+  catch(e){ $app.innerHTML = `<p class="err">${esc(e.message)}</p><p><a href="#/">목록으로</a></p>`; return; }
+  const isEp = path.startsWith("episodes/");
+  const title = titleOf(md) || path;
+  document.title = title + " · 차원관리사업부";
+  let h = `<div class="crumbs"><a href="#/">목록</a> · ${esc(path.split("/").pop())}</div>`;
+  h += `<article class="${isEp ? "" : "doc"}">${render(md)}</article>`;
+  if (isEp){
+    const idx = await getIndex();
+    const eps = episodes(idx);
+    const i = eps.findIndex(e => e.path === path);
+    const prev = i > 0 ? eps[i - 1] : null, next = i >= 0 && i < eps.length - 1 ? eps[i + 1] : null;
+    h += `<nav class="pager">`;
+    h += prev ? `<a href="${href(prev.path)}"><small>이전 화</small>${prev.no}화</a>` : `<span style="flex:1"></span>`;
+    h += next ? `<a class="next" href="${href(next.path)}"><small>다음 화</small>${next.no}화</a>` : `<a class="next" href="#/"><small>마지막 화입니다</small>목록으로</a>`;
+    h += `</nav>`;
+  }
+  $app.innerHTML = h;
+  const saved = (store.get(readKey, {})[path] || {}).pos || 0;
+  requestAnimationFrame(() => {
+    const hgt = document.documentElement.scrollHeight - innerHeight;
+    scrollTo(0, saved < 0.98 ? saved * hgt : 0);
+    trackScroll(path);
+  });
+}
+
+/* ---------- router ---------- */
+function route(){
+  const h = location.hash;
+  if (h.startsWith("#/read/")) viewRead(decodeURIComponent(h.slice(7)));
+  else viewLibrary().catch(e => { $app.innerHTML = `<p class="err">${esc(e.message)}</p>`; });
+}
+addEventListener("hashchange", route);
+route();
+</script>
+</body>
+</html>
